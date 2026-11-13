@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Что приготовить</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Manrope:wght@400;600;700&display=swap">
+<style>
+:root{--bg:#F4F7F6;--surf:#FFFFFF;--ink:#14202B;--mute:#5B6B76;--line:#DCE5E2;--acc:#14181B;--acc-ink:#FFFFFF;--soft:#ECEFEE;--kcal:#EF476F;--warm:#FFD166;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root{color-scheme:light}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Manrope,system-ui,-apple-system,"Segoe UI",sans-serif;padding-bottom:84px}
+main{max-width:560px;margin:0 auto;padding:20px 16px}
+h1,h2{font-family:Unbounded,Manrope,system-ui,sans-serif;font-weight:700;margin:0 0 12px;line-height:1.2}
+h1{font-size:26px}h2{font-size:19px}
+.sub{color:var(--mute);margin:0 0 16px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}
+.chip{border:1.5px solid var(--line);background:var(--surf);color:var(--ink);border-radius:999px;padding:9px 15px;font:600 14px Manrope,system-ui,sans-serif;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--acc);border-color:var(--acc);color:var(--acc-ink)}
+.btn{display:block;width:100%;border:0;border-radius:16px;background:var(--acc);color:var(--acc-ink);padding:16px;font:700 17px Unbounded,Manrope,sans-serif;cursor:pointer;margin:6px 0 18px}
+.btn.sm{display:inline-block;width:auto;font:700 14px Manrope,sans-serif;padding:9px 14px;border-radius:12px;margin:0}
+.btn.ghost{background:var(--soft);color:var(--ink)}
+button:focus-visible,summary:focus-visible,input:focus-visible{outline:3px solid var(--warm);outline-offset:2px}
+.card{background:var(--surf);border:1px solid var(--line);border-radius:18px;padding:16px;margin:0 0 12px}
+.card h3{font:700 18px/1.3 Manrope,sans-serif;margin:0 0 6px}
+.meta{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:14px;color:var(--mute);margin:0 0 10px}
+.kcal{color:var(--kcal);font-weight:700}
+.tag{background:var(--soft);border-radius:8px;padding:1px 8px;font-size:13px;font-weight:600;color:var(--ink)}
+ul.ing,ol.st{margin:6px 0 12px;padding-left:20px}
+ul.ing li,ol.st li{margin:3px 0}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.fav{margin-left:auto}
+.day{display:flex;gap:10px;align-items:flex-start}
+.day .d{font:700 15px Unbounded,sans-serif;width:34px;flex:none;padding-top:2px}
+.day .b{flex:1;min-width:0}
+details summary{cursor:pointer;font-weight:700;list-style:none}
+details summary::-webkit-details-marker{display:none}
+.sum{font-weight:700;margin:4px 0 16px}
+label.chk{display:flex;gap:12px;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)}
+label.chk input{width:22px;height:22px;accent-color:var(--acc)}
+label.chk input:checked+span{text-decoration:line-through;color:var(--mute)}
+.empty{color:var(--mute);padding:20px 4px}
+.slot{padding:10px 0;border-top:1px solid var(--line)}.sl{font-size:13px;color:var(--mute);font-weight:700}
+.normrow{display:flex;justify-content:space-between;align-items:center;gap:12px;font-weight:700;margin:0 0 12px}.normrow input{width:110px;border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;font:700 16px Manrope,sans-serif;background:var(--surf);color:var(--ink)}
+#app{padding-bottom:70px}
+button{transition:transform .15s,background .2s,color .2s,box-shadow .2s}
+.btn:active,.chip:active,nav button:active{transform:scale(.95)}
+.chip[aria-pressed="true"]{transform:translateY(-1px);box-shadow:0 3px 0 rgba(0,0,0,.18)}
+.fab{position:fixed;left:50%;bottom:calc(64px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:min(528px,calc(100% - 32px));margin:0;z-index:5;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.fab:active{transform:translateX(-50%) scale(.97)}
+.pop{animation:pop .45s cubic-bezier(.2,1.4,.4,1)}
+@keyframes pop{from{opacity:0;transform:translateY(18px) scale(.94)}to{opacity:1;transform:none}}
+.in{animation:slin .35s ease-out}
+@keyframes slin{from{opacity:0;transform:translateX(-24px)}to{opacity:1;transform:none}}
+.beat{animation:beat .4s}
+@keyframes beat{40%{transform:scale(1.18)}}
+.dtop{display:flex;gap:16px;align-items:center;margin-bottom:12px}
+.ringw{position:relative;width:112px;height:112px;flex:none}
+.ringw svg{width:100%;height:100%;transform:rotate(-90deg)}
+.rb,.rf{fill:none;stroke-width:9}.rb{stroke:var(--line)}.rf{stroke:var(--ink);stroke-linecap:round;transition:stroke-dashoffset .9s cubic-bezier(.3,.8,.3,1)}
+.rc{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1}.rc b{font:700 22px Unbounded,sans-serif}.rc span{font-size:12px;color:var(--mute)}
+.dl{flex:1;min-width:0}.sum2{font-weight:700;margin-bottom:8px}
+.bar{margin:8px 0}.bl{display:flex;justify-content:space-between;font-size:14px}.bt{height:8px;border-radius:99px;background:var(--line);overflow:hidden;margin-top:4px}.bt i{display:block;height:100%;width:0;border-radius:99px;transition:width .8s cubic-bezier(.3,.8,.3,1)}
+.item{display:flex;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line)}.item span{flex:1}
+.x{border:0;background:none;color:var(--mute);font-size:16px;cursor:pointer;padding:6px 8px}
+.macros{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 10px}.macros span{background:var(--soft);border-radius:8px;padding:2px 8px;font-size:13px;font-weight:700}
+details.dayc{background:var(--surf);border:1px solid var(--line);border-radius:18px;padding:4px 16px;margin:0 0 12px}
+details.dayc>summary{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 0;font:700 17px Manrope,sans-serif}
+details.dayc>summary::after{content:'›';font-size:22px;transition:transform .25s;transform:rotate(90deg)}
+details.dayc[open]>summary::after{transform:rotate(-90deg)}
+.tx{background:linear-gradient(currentColor,currentColor) 0 55%/0 2px no-repeat;transition:background-size .3s,color .3s}
+label.chk input:checked+.tx{background-size:100% 2px;color:var(--mute);text-decoration:none}
+.mute{color:var(--mute);font-weight:600;font-size:14px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--surf);border-top:1px solid var(--line);display:flex;padding-bottom:env(safe-area-inset-bottom,0px)}
+nav button{flex:1;border:0;background:none;color:var(--mute);padding:13px 4px;font:700 13px Manrope,sans-serif;cursor:pointer}
+nav button[aria-current="true"]{color:var(--acc);box-shadow:inset 0 3px 0 var(--acc)}
+</style>
+</head>
+<body>
+<main id="app"></main>
+<nav id="nav"></nav>
+<script>
+const P=(s)=>s.split(';').map(x=>{const a=x.split('|');return{n:a[0],q:parseFloat(a[1]),u:a[2]}});
+const R=[
+{id:1,n:'Курица с рисом и овощами',k:420,p:34,t:30,w:['work','week'],i:P('куриное филе|150|г;рис|60|г;замороженные овощи|100|г;соевый соус|1|ст. л.;растительное масло|1|ч. л.'),s:['Отварите рис.','Нарежьте филе и обжарьте 7 минут.','Добавьте овощи и соевый соус, тушите 5 минут.','Смешайте с рисом и разложите по контейнеру.']},
+{id:2,n:'Куриные котлеты с гречкой',k:390,p:36,t:40,w:['work','week'],i:P('куриный фарш|150|г;гречка|60|г;лук|0.5|шт.;свежий огурец|1|шт.'),s:['Смешайте фарш с тёртым луком, посолите.','Запекайте котлеты 25 минут при 190°C.','Отварите гречку.','Подавайте с огурцом.']},
+{id:3,n:'Боул с курицей и булгуром',k:410,p:33,t:30,w:['work'],i:P('куриное филе|130|г;булгур|60|г;свежий огурец|1|шт.;помидор|1|шт.;натуральный йогурт|2|ст. л.'),s:['Отварите булгур и курицу.','Нарежьте овощи.','Соберите всё в контейнер, йогурт добавьте сверху как соус.']},
+{id:4,n:'Куриный салат с яйцом',k:310,p:30,t:15,w:['work','week'],i:P('куриное филе|120|г;яйцо|1|шт.;свежий огурец|1|шт.;натуральный йогурт|2|ст. л.;зелень|0.5|пучка'),s:['Отварите филе и яйцо.','Нарежьте всё кубиками.','Заправьте йогуртом и посыпьте зеленью.']},
+{id:5,n:'Омлет с овощами',k:280,p:20,t:10,w:['breakfast','week','weekend'],i:P('яйцо|2|шт.;молоко|50|мл;помидор|1|шт.;сыр|20|г'),s:['Взбейте яйца с молоком.','Выложите нарезанный помидор на сковороду, залейте яйцами.','Посыпьте сыром и накройте крышкой на 5 минут.']},
+{id:6,n:'Запечённая курица с картофелем',k:450,p:35,t:60,w:['weekend'],i:P('куриные бёдра без кожи|200|г;картофель|200|г;чеснок|1|зубчик;паприка|1|ч. л.;растительное масло|1|ч. л.'),s:['Смешайте курицу со специями и маслом.','Выложите с картофелем на противень.','Запекайте 45 минут при 200°C.']},
+{id:7,n:'Куриный суп с лапшой',k:250,p:22,t:40,w:['work','week','weekend'],i:P('куриное филе|100|г;лапша|30|г;морковь|0.5|шт.;лук|0.5|шт.;картофель|100|г'),s:['Сварите бульон из филе 20 минут.','Добавьте картофель, морковь и лук.','За 5 минут до конца положите лапшу.']},
+{id:8,n:'Лосось с брокколи',k:400,p:32,t:25,w:['week','weekend'],i:P('лосось|150|г;брокколи|150|г;лимон|0.25|шт.;растительное масло|1|ч. л.'),s:['Выложите лосось и брокколи на противень.','Сбрызните маслом и лимоном.','Запекайте 15 минут при 200°C.']},
+{id:9,n:'Паста с курицей и шпинатом',k:460,p:36,t:25,w:['week'],i:P('паста|70|г;куриное филе|120|г;шпинат|50|г;сливки 10%|50|мл;чеснок|1|зубчик'),s:['Отварите пасту.','Обжарьте курицу с чесноком.','Добавьте шпинат и сливки на 3 минуты.','Смешайте с пастой.']},
+{id:10,n:'Творожная запеканка',k:230,p:24,t:45,w:['breakfast','weekend'],i:P('творог 5%|150|г;яйцо|1|шт.;манка|1|ст. л.;яблоко|0.5|шт.'),s:['Смешайте творог, яйцо и манку.','Добавьте нарезанное яблоко.','Запекайте 30 минут при 180°C.']},
+{id:11,n:'Чили с индейкой и фасолью',k:340,p:32,t:45,w:['work','weekend'],i:P('фарш из индейки|130|г;консервированная фасоль|80|г;томаты в собственном соку|100|г;лук|0.5|шт.;паприка|1|ч. л.'),s:['Обжарьте лук и фарш 8 минут.','Добавьте томаты, фасоль и паприку.','Тушите 20 минут. На следующий день вкуснее.']},
+{id:12,n:'Лаваш-ролл с курицей',k:350,p:28,t:15,w:['work'],i:P('тонкий лаваш|1|шт.;куриное филе|100|г;листья салата|30|г;помидор|0.5|шт.;натуральный йогурт|1|ст. л.'),s:['Отварите и нарежьте курицу.','Смажьте лаваш йогуртом, выложите начинку.','Заверните и разрежьте пополам.']},
+{id:13,n:'Греческий салат с курицей',k:330,p:28,t:15,w:['work','week'],i:P('куриное филе|100|г;свежий огурец|1|шт.;помидор|1|шт.;фета|30|г;оливковое масло|1|ч. л.'),s:['Отварите курицу.','Нарежьте овощи и фету.','Заправьте маслом. Для работы храните заправку отдельно.']},
+{id:14,n:'Тушёная курица с кабачком',k:300,p:32,t:30,w:['week','work'],i:P('куриное филе|150|г;кабачок|200|г;лук|0.5|шт.;томатная паста|1|ст. л.'),s:['Обжарьте лук и курицу.','Добавьте кабачок и томатную пасту.','Тушите под крышкой 15 минут.']},
+{id:15,n:'Сырники',k:270,p:22,t:25,w:['breakfast','weekend'],i:P('творог 5%|150|г;яйцо|1|шт.;мука|2|ст. л.;натуральный йогурт|1|ст. л.'),s:['Смешайте творог, яйцо и муку.','Сформируйте сырники.','Обжарьте на антипригарной сковороде по 3 минуты с каждой стороны.']},
+{id:16,n:'Овсянка с бананом и орехами',k:320,p:12,t:10,w:['breakfast'],i:P('овсяные хлопья|50|г;молоко|150|мл;банан|0.5|шт.;грецкие орехи|10|г'),s:['Сварите хлопья на молоке 5 минут.','Добавьте нарезанный банан и орехи.']},
+{id:17,n:'Скрэмбл с тостом',k:330,p:22,t:10,w:['breakfast'],i:P('яйцо|2|шт.;цельнозерновой хлеб|1|ломтик;помидор|0.5|шт.'),s:['Взбейте яйца и приготовьте на слабом огне, помешивая.','Подсушите хлеб, добавьте помидор.']},
+{id:18,n:'Йогурт с ягодами и мюсли',k:250,p:16,t:5,w:['breakfast'],i:P('греческий йогурт|150|г;ягоды|80|г;мюсли|20|г'),s:['Выложите йогурт в миску.','Добавьте ягоды и мюсли.']},
+{id:19,n:'Тост с яйцом и творожным сыром',k:230,p:14,t:10,w:['breakfast'],i:P('цельнозерновой хлеб|1|ломтик;яйцо|1|шт.;творожный сыр|30|г'),s:['Сварите яйцо.','Намажьте сыр на хлеб и выложите яйцо кружочками.']},
+{id:20,n:'Творог с ягодами',k:150,p:18,t:3,w:['snack'],i:P('творог 5%|100|г;ягоды|50|г'),s:['Смешайте творог с ягодами.']},
+{id:21,n:'Яблоко с арахисовой пастой',k:175,p:4,t:3,w:['snack'],i:P('яблоко|1|шт.;арахисовая паста|1|ст. л.'),s:['Нарежьте яблоко дольками.','Подавайте с пастой.']},
+{id:22,n:'Хумус с овощами',k:150,p:5,t:5,w:['snack'],i:P('хумус|40|г;морковь|1|шт.;свежий огурец|1|шт.'),s:['Нарежьте овощи брусочками.','Подавайте с хумусом.']},
+{id:23,n:'Яйцо с огурцом',k:100,p:8,t:10,w:['snack'],i:P('яйцо|1|шт.;свежий огурец|1|шт.'),s:['Сварите яйцо вкрутую.','Подавайте с огурцом.']},
+{id:24,n:'Кефир с бананом',k:170,p:7,t:3,w:['snack'],i:P('кефир 1%|200|мл;банан|1|шт.'),s:['Взбейте кефир с бананом блендером.']},
+{id:25,n:'Плов с курицей',k:430,p:32,t:50,w:['work','week','weekend'],i:P('куриное филе|130|г;рис|55|г;морковь|0.5|шт.;лук|0.5|шт.;растительное масло|1|ч. л.'),s:['Обжарьте лук, морковь и курицу.','Добавьте рис и воду на 1 см выше риса.','Томите под крышкой 20 минут.']},
+{id:26,n:'Курица терияки с рисом',k:440,p:34,t:25,w:['work','week'],i:P('куриное филе|140|г;рис|55|г;соевый соус|1|ст. л.;мёд|1|ч. л.;брокколи|80|г'),s:['Отварите рис и брокколи.','Обжарьте курицу, добавьте соус с мёдом на 2 минуты.','Соберите в контейнер.']},
+{id:27,n:'Треска с овощами в духовке',k:260,p:28,t:30,w:['week','weekend'],i:P('треска|180|г;кабачок|100|г;помидор|1|шт.;лимон|0.25|шт.'),s:['Выложите овощи и рыбу на противень.','Сбрызните лимоном.','Запекайте 20 минут при 190°C.']},
+{id:28,n:'Индейка с овощами в духовке',k:330,p:35,t:40,w:['work','weekend'],i:P('филе индейки|150|г;болгарский перец|1|шт.;брокколи|100|г;растительное масло|1|ч. л.'),s:['Нарежьте всё кусочками, смешайте с маслом.','Запекайте 30 минут при 200°C.']},
+{id:29,n:'Куриные тефтели в томатном соусе',k:360,p:32,t:40,w:['work','week'],i:P('куриный фарш|140|г;рис|30|г;томатная паста|1|ст. л.;лук|0.5|шт.'),s:['Смешайте фарш, сырой рис и лук, скатайте шарики.','Залейте водой с томатной пастой.','Тушите 25 минут.']},
+{id:30,n:'Куриный шашлык в духовке',k:300,p:38,t:50,w:['weekend'],i:P('куриное филе|180|г;свежий огурец|1|шт.;лук|0.5|шт.;соевый соус|1|ст. л.'),s:['Замаринуйте курицу с луком и соусом на 30 минут.','Запекайте 20 минут при 220°C.','Подавайте с огурцом.']},
+{id:31,n:'Тыквенный суп-пюре с курицей',k:270,p:20,t:35,w:['work','week','weekend'],i:P('тыква|200|г;куриное филе|80|г;сливки 10%|30|мл;лук|0.5|шт.'),s:['Сварите тыкву, лук и курицу 20 минут.','Курицу отложите, остальное пробейте блендером.','Добавьте сливки и курицу.']}
+];
+const CTX={breakfast:'Завтрак',work:'На работу',weekend:'Выходной',snack:'Перекус'};
+const DAYS=['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+let S={tab:'today',ctx:'work',cap:0,cur:null,plan:[],favs:[],mult:1,done:{},norm:1600};
+try{const x=JSON.parse(localStorage.getItem('chto-prigotovit')||'null');if(x){S.plan=x.plan||[];S.favs=x.favs||[];S.mult=x.mult||1;S.norm=x.norm||1600}}catch(e){}
+if(S.plan.length&&!S.plan[0].m)S.plan=[];
+function save(){try{localStorage.setItem('chto-prigotovit',JSON.stringify({plan:S.plan,favs:S.favs,mult:S.mult,norm:S.norm}))}catch(e){}}
+const byId=id=>R.find(r=>r.id===id);
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+function pool(ctx,cap,skip){return R.filter(r=>r.w.includes(ctx)&&(!cap||r.k<=cap)&&r.id!==skip)}
+function fmt(q){return Math.round(q*10)/10}
+function card(r,open){
+ const fav=S.favs.includes(r.id);
+ return `<div class="card"><h3>${r.n}</h3><div class="meta"><span class="kcal">${r.k} ккал</span><span>белок ${r.p} г</span><span>${r.t} мин</span></div>
+ <div class="meta">${r.w.map(w=>`<span class="tag">${CTX[w]}</span>`).join('')}</div>
+ ${open?`<b>Продукты на 1 порцию</b><ul class="ing">${r.i.map(x=>`<li>${x.n}: ${fmt(x.q)} ${x.u}</li>`).join('')}</ul><b>Как готовить</b><ol class="st">${r.s.map(x=>`<li>${x}</li>`).join('')}</ol>`:''}
+ <div class="row">${open?'':`<button class="btn sm ghost" data-a="open" data-id="${r.id}">Рецепт</button>`}<button class="btn sm ghost fav" data-a="fav" data-id="${r.id}" aria-pressed="${fav}">${fav?'♥ В избранном':'♡ В избранное'}</button></div></div>`;
+}
+function viewToday(){
+ const caps=[[0,'Любые'],[300,'до 300 ккал'],[400,'до 400 ккал'],[450,'до 450 ккал']];
+ return `<h1>Что приготовить?</h1><p class="sub">Выберите, для чего нужно блюдо.</p>
+ <div class="chips">${Object.keys(CTX).map(k=>`<button class="chip" data-a="ctx" data-v="${k}" aria-pressed="${S.ctx===k}">${CTX[k]}</button>`).join('')}</div>
+ <div class="chips">${caps.map(c=>`<button class="chip" data-a="cap" data-v="${c[0]}" aria-pressed="${S.cap===c[0]}">${c[1]}</button>`).join('')}</div>
+ <button class="btn" data-a="roll">${S.cur?'Другой вариант':'Подобрать блюдо'}</button>
+ ${S.cur?card(byId(S.cur),true):'<p class="empty">Нажмите кнопку, и приложение предложит блюдо.</p>'}`;
+}
+function viewWeek(){
+ const head=`<h1>Меню на неделю</h1><p class="sub">Будни: еда на работу и ужины. Выходные: готовка побольше.</p><button class="btn" data-a="gen">${S.plan.length?'Собрать заново':'Собрать меню'}</button>`;
+ if(!S.plan.length)return head+'<p class="empty">Меню пока пустое.</p>';
+ const total=S.plan.reduce((a,id)=>a+byId(id).k,0);
+ return head+S.plan.map((id,i)=>{const r=byId(id);return `<div class="card day"><div class="d">${DAYS[i]}</div><div class="b"><details><summary>${r.n}</summary><div class="meta"><span class="kcal">${r.k} ккал</span><span>${r.t} мин</span></div><ul class="ing">${r.i.map(x=>`<li>${x.n}: ${fmt(x.q)} ${x.u}</li>`).join('')}</ul><ol class="st">${r.s.map(x=>`<li>${x}</li>`).join('')}</ol></details><div class="meta" style="margin:6px 0 8px"><span class="kcal">${r.k} ккал</span><span>${r.t} мин</span></div><button class="btn sm ghost" data-a="swap" data-i="${i}">Заменить</button></div></div>`}).join('')+`<p class="sum">В среднем ${Math.round(total/7)} ккал на блюдо в день</p>`;
+}
+function viewShop(){
+ const head=`<h1>Покупки</h1><div class="chips">${[1,2,3].map(m=>`<button class="chip" data-a="mult" data-v="${m}" aria-pressed="${S.mult===m}">${m} ${m===1?'порция':'порции'}</button>`).join('')}</div>`;
+ if(!S.plan.length)return head+'<p class="empty">Сначала соберите меню на неделю.</p>';
+ const m={};S.plan.forEach(id=>byId(id).i.forEach(x=>{const k=x.n+'|'+x.u;m[k]=(m[k]||0)+x.q*S.mult}));
+ const rows=Object.keys(m).sort().map(k=>{const [n,u]=k.split('|');return `<label class="chk"><input type="checkbox" data-a="done" data-v="${k}" ${S.done[k]?'checked':''}><span>${n}: ${fmt(m[k])} ${u}</span></label>`}).join('');
+ return head+`<div class="card" style="padding:4px 16px">${rows}</div>`;
+}
+function viewFav(){
+ return `<h1>Избранное</h1>`+(S.favs.length?S.favs.map(id=>card(byId(id),false)).join(''):'<p class="empty">Здесь появятся блюда, которые вы отметите сердечком.</p>');
+}
+function render(){
+ const v={today:viewToday,week:viewWeek,shop:viewShop,fav:viewFav}[S.tab]();
+ document.getElementById('app').innerHTML=v;
+ const T=[['today','Сегодня'],['week','Неделя'],['shop','Покупки'],['fav','Избранное']];
+ document.getElementById('nav').innerHTML=T.map(t=>`<button data-a="tab" data-v="${t[0]}" ${S.tab===t[0]?'aria-current="true"':''}>${t[1]}</button>`).join('');
+}
+function genPlan(){
+ const used=[];
+ S.plan=DAYS.map((d,i)=>{
+  const ctx=i<5?(i%2===0?'work':'week'):'weekend';
+  let p=pool(ctx,S.cap).filter(r=>!used.includes(r.id));
+  if(!p.length)p=pool(ctx,0);
+  const r=pick(p);used.push(r.id);return r.id});
+ S.done={};save();
+}
+document.addEventListener('click',e=>{
+ const b=e.target.closest('[data-a]');if(!b)return;
+ const a=b.dataset.a,v=b.dataset.v,id=+b.dataset.id;if(a==='norm')return;
+ if(a==='tab')S.tab=v;
+ else if(a==='ctx'){S.ctx=v;S.cur=null}
+ else if(a==='cap'){S.cap=+v;S.cur=null}
+ else if(a==='roll'){const p=pool(S.ctx,S.cap,S.cur);S.cur=(p.length?pick(p):pick(pool(S.ctx,0))).id}
+ else if(a==='open'){S.tab='today';S.cur=id}
+ else if(a==='fav'){S.favs=S.favs.includes(id)?S.favs.filter(x=>x!==id):[...S.favs,id];save()}
+ else if(a==='gen')genPlan();
+ else if(a==='swap'){const i=+b.dataset.i,ctx=i<5?(i%2===0?'work':'week'):'weekend';const p=pool(ctx,S.cap,S.plan[i]).filter(r=>!S.plan.includes(r.id));S.plan[i]=(p.length?pick(p):pick(pool(ctx,0,S.plan[i]))).id;save()}
+ else if(a==='mult'){S.mult=+v;save()}
+ else if(a==='add'){S.today.items.push({id:id,f:1});S.fresh=S.today.items.length-1;saveT()}
+ else if(a==='rm'){S.today.items.splice(+b.dataset.i,1);saveT()}
+ else if(a==='takeplan'){const d=S.plan[dayIdx()];if(d){S.today.items=d.m.map(m=>({id:m,f:d.f}));saveT()}}
+ else if(a==='swap2'){const i=+b.dataset.i,j=+b.dataset.j,d=S.plan[i],cur=byId(d.m[j]),ctx=slots(i)[j][1];const c=R.filter(r=>ok(ctx,r)&&!d.m.includes(r.id));const n=c.filter(r=>Math.abs(r.k-cur.k)<=80);d.m[j]=pick(n.length?n:c).id;calc(d);save()}
+ else if(a==='done'){S.done[v]=b.checked;return}
+ const y=window.scrollY;render();if(a!=='tab'&&a!=='open')window.scrollTo(0,y);else window.scrollTo(0,0);
+});
+const DAYL=['Понедельник','Вторник','Среда','Четверг','Пятница','Суббота','Воскресенье'],SL=['Завтрак','Обед','Ужин','Перекус'];
+function slots(i){return [['Завтрак','breakfast'],['Обед',i<5?'work':'weekend'],['Ужин','week'],['Перекус','snack']]}
+function ok(ctx,r){return r.w.includes(ctx)&&(ctx==='breakfast'||ctx==='snack'||!r.w.includes('breakfast'))}
+function calc(d){const t=d.m.reduce((a,id)=>a+byId(id).k,0);d.f=Math.round(Math.min(1.6,Math.max(.7,S.norm/t))*20)/20;return d}
+function genPlan(){const used={};S.plan=DAYS.map((x,i)=>{let best=null,bd=1e9;for(let t=0;t<80;t++){const day=slots(i).map(s=>{const p=R.filter(r=>ok(s[1],r)),f=p.filter(r=>!used[r.id]);return pick(f.length?f:p).id});if(new Set(day).size<day.length)continue;const dd=Math.abs(day.reduce((a,id)=>a+byId(id).k,0)-S.norm);if(dd<bd){bd=dd;best=day}}if(!best)best=slots(i).map(s=>R.find(r=>ok(s[1],r)).id);best.forEach(id=>used[id]=1);return calc({m:best})});S.done={};save()}
+function viewWeek(){
+ const head=`<h1>Меню на неделю</h1><p class="sub">Завтрак, обед, ужин и перекус на каждый день. Размер порций подстраивается под вашу норму.</p><label class="normrow"><span>Норма калорий в день</span><input type="number" inputmode="numeric" min="1000" max="3500" step="50" value="${S.norm}" data-a="norm"></label><button class="btn" data-a="gen">${S.plan.length?'Собрать заново':'Собрать меню'}</button>`;
+ if(!S.plan.length)return head+'<p class="empty">Меню пока пустое.</p>';
+ return head+S.plan.map((d,i)=>{const tot=d.m.reduce((a,id)=>a+Math.round(byId(id).k*d.f),0);return `<div class="card"><h3>${DAYL[i]}</h3><div class="meta"><span class="kcal">${tot} ккал</span><span>порции ×${d.f}</span></div>`+d.m.map((id,j)=>{const r=byId(id);return `<div class="slot"><div class="sl">${SL[j]}</div><details><summary>${r.n}</summary><ul class="ing">${r.i.map(x=>`<li>${x.n}: ${fmt(x.q*d.f)} ${x.u}</li>`).join('')}</ul><ol class="st">${r.s.map(x=>`<li>${x}</li>`).join('')}</ol></details><div class="meta" style="margin:4px 0 8px"><span class="kcal">${Math.round(r.k*d.f)} ккал</span><span>${r.t} мин</span></div><button class="btn sm ghost" data-a="swap2" data-i="${i}" data-j="${j}">Заменить</button></div>`}).join('')+'</div>'}).join('');
+}
+function viewShop(){
+ const head=`<h1>Покупки</h1><div class="chips">${[1,2,3].map(m=>`<button class="chip" data-a="mult" data-v="${m}" aria-pressed="${S.mult===m}">${m} ${m===1?'человек':'человека'}</button>`).join('')}</div>`;
+ if(!S.plan.length)return head+'<p class="empty">Сначала соберите меню на неделю.</p>';
+ const m={};S.plan.forEach(d=>d.m.forEach(id=>byId(id).i.forEach(x=>{const k=x.n+'|'+x.u;m[k]=(m[k]||0)+x.q*d.f*S.mult})));
+ const rows=Object.keys(m).sort().map(k=>{const [n,u]=k.split('|');return `<label class="chk"><input type="checkbox" data-a="done" data-v="${k}" ${S.done[k]?'checked':''}><span>${n}: ${fmt(m[k])} ${u}</span></label>`}).join('');
+ return head+`<div class="card" style="padding:4px 16px">${rows}</div>`;
+}
+document.addEventListener('change',e=>{const b=e.target.closest('[data-a="norm"]');if(b){S.norm=Math.min(3500,Math.max(1000,+b.value||1600));S.plan.forEach(calc);save();render()}});
+const MAC={1:[48,10,5],2:[39,10,5],3:[47,10,6],4:[18,13,2],5:[12,17,2],6:[44,15,5],7:[29,5,3],8:[18,22,5],9:[52,12,4],10:[20,6,1],11:[35,8,9],12:[41,8,3],13:[18,16,3],14:[27,7,4],15:[27,8,1],16:[41,12,6],17:[22,17,3],18:[28,8,3],19:[23,9,3],20:[8,5,1],21:[22,8,4],22:[19,6,5],23:[6,5,1],24:[31,2,3],25:[51,11,3],26:[60,7,4],27:[26,5,4],28:[27,9,5],29:[35,10,3],30:[23,6,3],31:[27,9,4]};
+R.push(
+{id:32,n:'Гречка с грибами и курицей',k:380,p:34,c:43,f:8,fb:6,t:35,w:['work','weekend'],i:P('куриное филе|120|г;гречка|60|г;шампиньоны|100|г;лук|0.5|шт.'),s:['Отварите гречку.','Обжарьте лук, грибы и курицу 10 минут.','Смешайте с гречкой.']},
+{id:33,n:'Рыбные котлеты из минтая',k:280,p:28,c:28,f:6,fb:3,t:35,w:['work','weekend'],i:P('филе минтая|180|г;лук|0.5|шт.;овсяные хлопья|30|г'),s:['Прокрутите рыбу с луком, добавьте хлопья.','Сформируйте котлеты.','Запекайте 25 минут при 190°C.']},
+{id:34,n:'Шакшука',k:290,p:15,c:19,f:17,fb:4,t:20,w:['breakfast','weekend'],i:P('яйцо|2|шт.;помидор|2|шт.;болгарский перец|0.5|шт.;лук|0.5|шт.'),s:['Обжарьте лук и перец, добавьте помидоры на 7 минут.','Сделайте углубления и вбейте яйца.','Накройте крышкой на 5 минут.']},
+{id:35,n:'Гречка с яйцом',k:340,p:16,c:49,f:9,fb:6,t:20,w:['breakfast'],i:P('гречка|60|г;яйцо|1|шт.;сливочное масло|5|г'),s:['Отварите гречку.','Сварите яйцо.','Подавайте с маслом.']},
+{id:36,n:'Панкейки на овсянке с творогом',k:310,p:20,c:39,f:8,fb:5,t:20,w:['breakfast','weekend'],i:P('овсяные хлопья|40|г;яйцо|1|шт.;творог 5%|80|г;банан|0.5|шт.'),s:['Измельчите всё блендером.','Жарьте небольшие панкейки по 2 минуты с каждой стороны.']},
+{id:37,n:'Салат с тунцом и фасолью',k:300,p:26,c:29,f:9,fb:8,t:10,w:['work'],i:P('тунец в собственном соку|80|г;консервированная фасоль|80|г;свежий огурец|1|шт.;листья салата|30|г;оливковое масло|1|ч. л.'),s:['Нарежьте огурец.','Смешайте всё в контейнере.','Заправьте маслом перед едой.']},
+{id:38,n:'Жареный рис с яйцом и овощами',k:380,p:16,c:59,f:9,fb:4,t:20,w:['work'],i:P('рис|70|г;яйцо|1|шт.;замороженные овощи|100|г;соевый соус|1|ст. л.'),s:['Отварите рис.','Обжарьте овощи, добавьте яйцо.','Смешайте с рисом и соусом.']},
+{id:39,n:'Куриные рулетики со шпинатом',k:320,p:40,c:15,f:11,fb:2,t:45,w:['weekend'],i:P('куриное филе|180|г;шпинат|50|г;сыр|20|г'),s:['Разрежьте и отбейте филе.','Выложите шпинат и сыр, сверните.','Запекайте 30 минут при 190°C.']},
+{id:40,n:'Рагу с индейкой',k:310,p:30,c:29,f:8,fb:7,t:40,w:['work','weekend'],i:P('филе индейки|130|г;кабачок|100|г;баклажан|100|г;помидор|1|шт.;лук|0.5|шт.'),s:['Обжарьте индейку с луком.','Добавьте овощи и тушите 25 минут.']},
+{id:41,n:'Смузи с бананом и творогом',k:190,p:14,c:27,f:3,fb:2,t:5,w:['snack'],i:P('творог 5%|80|г;банан|0.5|шт.;молоко|100|мл'),s:['Взбейте всё блендером.']},
+{id:42,n:'Орехи с курагой',k:160,p:4,c:15,f:9,fb:3,t:2,w:['snack'],i:P('миндаль|15|г;курага|20|г'),s:['Смешайте и возьмите с собой в контейнере.']},
+{id:43,n:'Сэндвич с курицей и овощами',k:380,p:30,c:44,f:9,fb:6,t:15,w:['work'],i:P('цельнозерновой хлеб|2|ломтика;куриное филе|100|г;листья салата|20|г;помидор|0.5|шт.;натуральный йогурт|1|ст. л.'),s:['Отварите и нарежьте курицу.','Соберите сэндвич с йогуртом, салатом и помидором.']}
+);
+R.forEach(r=>{if(MAC[r.id]){r.c=MAC[r.id][0];r.f=MAC[r.id][1];r.fb=MAC[r.id][2]}r.w=r.w.filter(x=>x!=='week');if(!r.w.length)r.w=['weekend']});
+function dstr(){const t=new Date();return t.getFullYear()+'-'+(t.getMonth()+1)+'-'+t.getDate()}
+function dayIdx(){return (new Date().getDay()+6)%7}
+function saveT(){try{localStorage.setItem('chto-today',JSON.stringify(S.today))}catch(e){}}
+S.today={d:dstr(),items:[]};S.open={};S.fresh=-1;S.shown=null;S.beat=null;
+try{const y=JSON.parse(localStorage.getItem('chto-today')||'null');if(y&&y.d===dstr())S.today=y}catch(e){}
+function slots(i){return [['Завтрак','breakfast'],['Обед',i<5?'work':'weekend'],['Ужин','dinner'],['Перекус','snack']]}
+function ok(ctx,r){if(ctx==='dinner')return !r.w.includes('breakfast')&&!r.w.includes('snack')&&(r.w.includes('work')||r.w.includes('weekend'));return r.w.includes(ctx)&&(ctx==='breakfast'||ctx==='snack'||!r.w.includes('breakfast'))}
+function tot(items){const t={k:0,p:0,c:0,f:0,fb:0};items.forEach(x=>{const r=byId(x.id);t.k+=r.k*x.f;t.p+=r.p*x.f;t.c+=r.c*x.f;t.f+=r.f*x.f;t.fb+=r.fb*x.f});return t}
+function bar(l,v,g,col){const w=Math.min(100,g?v/g*100:0);return `<div class="bar"><div class="bl"><span>${l}</span><b>${Math.round(v)} / ${Math.round(g)} г</b></div><div class="bt"><i data-w="${w}" style="background:${col}"></i></div></div>`}
+function normRow(){return `<label class="normrow"><span>Норма калорий</span><input type="number" inputmode="numeric" min="1000" max="3500" step="50" value="${S.norm}" data-a="norm"></label>`}
+function card(r,open,pop,add){
+ const fav=S.favs.includes(r.id),beat=S.beat===r.id;if(beat)S.beat=null;
+ return `<div class="card${pop?' pop':''}"><h3>${r.n}</h3><div class="meta"><span class="kcal">${r.k} ккал</span><span>${r.t} мин</span></div><div class="macros"><span>Б ${r.p}</span><span>У ${r.c}</span><span>Ж ${r.f}</span><span>Кл ${r.fb}</span></div><div class="meta">${r.w.map(w=>`<span class="tag">${CTX[w]}</span>`).join('')}</div>${open?`<b>Продукты на 1 порцию</b><ul class="ing">${r.i.map(x=>`<li>${x.n}: ${fmt(x.q)} ${x.u}</li>`).join('')}</ul><b>Как готовить</b><ol class="st">${r.s.map(x=>`<li>${x}</li>`).join('')}</ol>`:''}<div class="row">${open?'':`<button class="btn sm ghost" data-a="open" data-id="${r.id}">Рецепт</button>`}${add?`<button class="btn sm" data-a="add" data-id="${r.id}">Добавить в сегодня</button>`:''}<button class="btn sm ghost fav${beat?' beat':''}" data-a="fav" data-id="${r.id}" aria-pressed="${fav}">${fav?'♥ В избранном':'♡ В избранное'}</button></div></div>`;
+}
+function viewToday(){
+ const T=tot(S.today.items),pop=S.cur!==S.shown;S.shown=S.cur;
+ const off=276.5*(1-Math.min(1,T.k/S.norm)),left=Math.round(S.norm-T.k);
+ const caps=[[0,'Любые'],[300,'до 300 ккал'],[400,'до 400 ккал'],[450,'до 450 ккал']];
+ const list=S.today.items.length?S.today.items.map((x,i)=>{const r=byId(x.id);return `<div class="item${S.fresh===i?' in':''}"><span>${r.n}</span><b class="kcal">${Math.round(r.k*x.f)}</b><button class="x" data-a="rm" data-i="${i}" aria-label="Убрать из сегодняшнего меню">✕</button></div>`}).join(''):'<p class="empty">Пока ничего не добавлено.</p>';
+ return `<h1>Сегодня</h1><p class="sub">Цели считаются от нормы: 30% белков, 40% углеводов, 30% жиров. Б — белки, У — углеводы, Ж — жиры, Кл — клетчатка.</p><div class="card"><div class="dtop"><div class="ringw"><svg viewBox="0 0 100 100" aria-hidden="true"><circle class="rb" cx="50" cy="50" r="44"/><circle class="rf" cx="50" cy="50" r="44" stroke-dasharray="276.5" stroke-dashoffset="276.5" data-off="${off}"/></svg><div class="rc"><b>${Math.round(T.k)}</b><span>ккал</span></div></div><div class="dl"><div class="sum2">${left>=0?`Осталось ${left} ккал`:`Выше нормы на ${-left} ккал`}</div>${normRow()}</div></div>${bar('Белки',T.p,S.norm*.3/4,'var(--kcal)')}${bar('Углеводы',T.c,S.norm*.4/4,'var(--warm)')}${bar('Жиры',T.f,S.norm*.3/9,'#4B7BE5')}${bar('Клетчатка',T.fb,25,'#3BA776')}</div>
+ <div class="card"><h2>Что съедено</h2>${list}${S.plan.length?`<button class="btn sm ghost" data-a="takeplan" style="margin-top:10px">Взять меню на сегодня</button>`:''}</div>
+ <h2>Подобрать блюдо</h2><div class="chips">${Object.keys(CTX).map(k=>`<button class="chip" data-a="ctx" data-v="${k}" aria-pressed="${S.ctx===k}">${CTX[k]}</button>`).join('')}</div><div class="chips">${caps.map(c=>`<button class="chip" data-a="cap" data-v="${c[0]}" aria-pressed="${S.cap===c[0]}">${c[1]}</button>`).join('')}</div>
+ ${S.cur?card(byId(S.cur),true,pop,true):'<p class="empty">Нажмите кнопку внизу, и приложение предложит блюдо.</p>'}
+ <button class="btn fab" data-a="roll">${S.cur?'Другой вариант':'Подобрать блюдо'}</button>`;
+}
+function viewWeek(){
+ const head=`<h1>Меню на неделю</h1><p class="sub">Завтрак, обед, ужин и перекус на каждый день. Размер порций подстраивается под вашу норму.</p>${normRow()}<button class="btn" data-a="gen">${S.plan.length?'Собрать заново':'Собрать меню'}</button>`;
+ if(!S.plan.length)return head+'<p class="empty">Меню пока пустое.</p>';
+ return head+S.plan.map((d,i)=>{const T=tot(d.m.map(id=>({id:id,f:d.f}))),op=S.open[i]===undefined?i===dayIdx():S.open[i];
+  return `<details class="dayc" data-day="${i}" ${op?'open':''}><summary><span>${DAYL[i]}</span><span class="kcal">${Math.round(T.k)} ккал</span></summary><div class="macros"><span>Б ${Math.round(T.p)}</span><span>У ${Math.round(T.c)}</span><span>Ж ${Math.round(T.f)}</span><span>Кл ${Math.round(T.fb)}</span><span>порции ×${d.f}</span></div>`+d.m.map((id,j)=>{const r=byId(id);return `<div class="slot"><div class="sl">${SL[j]}</div><details><summary>${r.n}</summary><ul class="ing">${r.i.map(x=>`<li>${x.n}: ${fmt(x.q*d.f)} ${x.u}</li>`).join('')}</ul><ol class="st">${r.s.map(x=>`<li>${x}</li>`).join('')}</ol></details><div class="meta" style="margin:4px 0 8px"><span class="kcal">${Math.round(r.k*d.f)} ккал</span><span>${r.t} мин</span></div><button class="btn sm ghost" data-a="swap2" data-i="${i}" data-j="${j}">Заменить</button></div>`}).join('')+'</details>'}).join('');
+}
+function ing(items){const m={};items.forEach(x=>byId(x.id).i.forEach(y=>{const k=y.n+'|'+y.u;m[k]=(m[k]||0)+y.q*x.f}));return m}
+function sec(key,title,m,op){const rows=Object.keys(m).sort().map(k=>{const p=k.split('|'),kk=key+'|'+k;return `<label class="chk"><input type="checkbox" data-a="done" data-v="${kk}" ${S.done[kk]?'checked':''}><span class="tx">${p[0]}: ${fmt(m[k])} ${p[1]}</span></label>`}).join('');return `<details class="dayc" data-day="s${key}" ${op?'open':''}><summary><span>${title}</span><span class="mute">${Object.keys(m).length} шт.</span></summary>${rows}</details>`}
+function viewShop(){
+ const secs=[];
+ if(S.today.items.length)secs.push(sec('t','Сегодня',ing(S.today.items),S.open.st===undefined?true:S.open.st));
+ S.plan.forEach((d,i)=>secs.push(sec(i,DAYL[i],ing(d.m.map(id=>({id:id,f:d.f}))),S.open['s'+i]===undefined?i===dayIdx():S.open['s'+i])));
+ return `<h1>Покупки</h1><p class="sub">Список по дням: сначала то, что вы выбрали на сегодня, затем меню на неделю.</p>`+(secs.length?secs.join(''):'<p class="empty">Добавьте блюдо на сегодня или соберите меню на неделю.</p>');
+}
+function render(){
+ const v={today:viewToday,week:viewWeek,shop:viewShop,fav:viewFav}[S.tab]();
+ document.getElementById('app').innerHTML=v;
+ const T=[['today','Сегодня'],['week','Неделя'],['shop','Покупки'],['fav','Избранное']];
+ document.getElementById('nav').innerHTML=T.map(t=>`<button data-a="tab" data-v="${t[0]}" ${S.tab===t[0]?'aria-current="true"':''}>${t[1]}</button>`).join('');
+ S.fresh=-1;
+ requestAnimationFrame(()=>requestAnimationFrame(()=>{document.querySelectorAll('[data-w]').forEach(el=>el.style.width=el.dataset.w+'%');document.querySelectorAll('[data-off]').forEach(el=>el.style.strokeDashoffset=el.dataset.off)}));
+}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-a="fav"]');if(b)S.beat=+b.dataset.id},true);
+document.addEventListener('toggle',e=>{const d=e.target;if(d.dataset&&d.dataset.day!==undefined)S.open[d.dataset.day]=d.open},true);
+try{const tg=window.Telegram&&Telegram.WebApp;if(tg){tg.ready();tg.expand();try{tg.setHeaderColor('#F4F7F6');tg.setBackgroundColor('#F4F7F6')}catch(e){}}}catch(e){}
+render();
+</script>
+</body>
+</html>
